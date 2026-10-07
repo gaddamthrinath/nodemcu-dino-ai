@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large raw training recordings (keep dataset CSV clean)
+data/dino-training-*.json
+*.jsonl
+
+# Environment and IDE
+.venv/
+venv/
+ENV/
+.idea/
+.vscode/
+*.swp
+*.bak
+
+# Arduino build artifacts
+*.hex
+*.bin
+*.elf
+
+# Operating System Files
+.DS_Store
+Thumbs.db
