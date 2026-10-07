@@ -24,3 +24,9 @@ ENV/
 # Operating System Files
 .DS_Store
 Thumbs.db
+
+# Local Reports and Scratch Notes
+DEVELOPMENT_REPORT.md
+*_REPORT.md
+*.report.md
+
