@@ -23,6 +23,18 @@
 * **High Score: 4,567**: Successfully navigates 100+ obstacle sequences and flying pterodactyls at maximum speed cap (`13.0 px/frame`).
 * **Full-Screen Live Telemetry HUD**: Glassmorphic dashboard displaying live decisions, distance, physics, and round-trip serial latency in real time.
 * **Draggable Interface**: Drag the on-screen dashboard anywhere to avoid obstructing the in-game score.
+* **Complete Student Study Course**: 4 in-depth modular guides covering feature engineering, PyTorch math, embedded C optimization, and real-world industrial IoT applications in [`study_material/`](study_material/README.md).
+
+---
+
+## Complete Study Material & Engineering Course
+
+Comprehensive step-by-step notes, mathematical derivations, code walkthroughs, and real-world industrial applications are provided in the [`study_material/`](study_material/README.md) directory:
+
+1. [Module 01: Data & Feature Engineering](study_material/01_data_and_feature_engineering.md) - Game state extraction, why features beat raw pixels, Time-To-Collision physics, data cleaning pipeline, and robotics parallels.
+2. [Module 02: Neural Network Math & PyTorch Training](study_material/02_neural_network_math_and_pytorch.md) - MLP architecture, forward pass math, ReLU benefits, inverse class frequency weighting, input scaling, and C code generation.
+3. [Module 03: Embedded C & Hardware Inference](study_material/03_embedded_c_and_hardware_inference.md) - ESP8266 memory architecture, Flash ROM (`PROGMEM`) vs SRAM, pure C forward pass (`< 0.08 ms`), and non-blocking serial packet parsing.
+4. [Module 04: Real-Time Bridge & Real-World Applications](study_material/04_realtime_bridge_and_realworld_applications.md) - Sub-2ms latency budgeting, Selenium bridge, stateful keypress controller, and complete blueprints for factory predictive maintenance, precision agriculture, smart wearables, and drone collision avoidance.
 
 ---
 
