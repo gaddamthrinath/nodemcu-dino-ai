@@ -314,6 +314,13 @@ dino-ai-nodemcu/
 #### Q: Why did the Dino crash at score 4567?
 * **Explanation**: At score 4000+, the game runs at maximum velocity (`speed = 13.0`). If two obstacles spawn in close cluster sequence (~50px apart), the dinosaur is still in the air descending from jump 1 when obstacle 2 arrives, leaving insufficient ground runway for takeoff.
 
+#### Q: Why does the Dino crash immediately when I switch applications or minimize Chrome?
+* **Explanation**: 
+  1. **Chromium Frame Throttling**: When Chrome loses focus or is placed in the background, Chromium automatically throttles background windows to save power, dropping `requestAnimationFrame` from **60 FPS down to 1 FPS (or pausing it completely)**.
+  2. **Delta-Time Spikes ("Teleporting" Obstacles)**: The game physics engine calculates obstacle positions using elapsed delta time ($\Delta t$). When Chrome freezes or throttles for even 200–500 ms, the next frame has a massive $\Delta t$, causing oncoming obstacles to instantly teleport forward into the dinosaur in a single frame.
+  3. **Input Desynchronization**: Dispatched jump/duck keystrokes from the NodeMCU/Python bridge are queued or delayed by Chrome's throttled event loop, causing the Dino to jump too late.
+* **Fix**: **Keep the Chrome window in the foreground and visible on your screen** while the AI is playing. Do not minimize Chrome or cover it with other full-screen application windows.
+
 ---
 
 ## License
