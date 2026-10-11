@@ -18,13 +18,11 @@
 ## 🎬 Live Demo
 
 <div align="center">
-  <video src="demo.mp4" width="100%" controls="controls" autoplay muted loop>
-    Your browser does not support the video tag.
-  </video>
+  <img src="demo.gif" width="100%" alt="NodeMCU Dino AI Live Demo" />
   <p><i>Live demonstration of NodeMCU ESP8266 making real-time on-chip neural network decisions to control the Chrome Dinosaur.</i></p>
 </div>
 
-> 📺 **Direct Video File**: You can also open or download the high-resolution recording directly at [demo.mp4](demo.mp4).
+> 📺 **Full Video**: Watch the complete 1.5-minute high-resolution recording at [demo.mp4](demo.mp4).
 
 ---
 
