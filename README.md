@@ -2,7 +2,6 @@
 
 <div align="center">
 
-![Max Score](https://img.shields.io/badge/Max%20Score-4%2C567-brightgreen?style=for-the-badge&logo=google-chrome&logoColor=white)
 ![Hardware](https://img.shields.io/badge/Hardware-NodeMCU%20ESP8266-00979D?style=for-the-badge&logo=arduino&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/Model-PyTorch%20MLP-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -16,13 +15,26 @@
 
 ---
 
+## 🎬 Live Demo
+
+<div align="center">
+  <video src="demo.mp4" width="100%" controls="controls" autoplay muted loop>
+    Your browser does not support the video tag.
+  </video>
+  <p><i>Live demonstration of NodeMCU ESP8266 making real-time on-chip neural network decisions to control the Chrome Dinosaur.</i></p>
+</div>
+
+> 📺 **Direct Video File**: You can also open or download the high-resolution recording directly at [demo.mp4](demo.mp4).
+
+---
+
 ## Highlights
 
 * **100% On-Chip Neural Network**: The model lives and executes inside the NodeMCU Flash ROM (`PROGMEM`). No hardcoded heuristics or distance threshold rules.
-* **Ultra-Low Latency (< 0.1 ms)**: Optimized C forward pass with fixed memory allocation and non-blocking serial packet buffering.
-* **High Score: 4,567**: Successfully navigates 100+ obstacle sequences and flying pterodactyls at maximum speed cap (`13.0 px/frame`).
+* **Ultra-Low Latency**: Optimized C forward pass with fixed memory allocation and non-blocking serial packet buffering.
+* **Autonomous Edge Intelligence**: Successfully navigates continuous obstacle sequences and flying pterodactyls at maximum speed cap (`13.0 px/frame`).
 * **Full-Screen Live Telemetry HUD**: Glassmorphic dashboard displaying live decisions, distance, physics, and round-trip serial latency in real time.
-* **Draggable Interface**: Drag the on-screen dashboard anywhere to avoid obstructing the in-game score.
+* **Draggable Interface**: Drag the on-screen dashboard anywhere to customize your view.
 * **Complete Student Study Course**: 4 in-depth modular guides covering feature engineering, PyTorch math, embedded C optimization, and real-world industrial IoT applications in [`study_material/`](study_material/README.md).
 
 ---
@@ -184,7 +196,7 @@ The bridge injects a HUD on the top-right corner of the Chrome window:
 | CURRENT ACTION                        RUNNING |
 +-----------------------+-----------------------+
 | GAME SCORE            | MCU LATENCY           |
-| 4567     HI 4567      | 1.8 ms                |
+| 1250     HI 1250      | 1.8 ms                |
 +-----------------------+-----------------------+
 | OBSTACLE              | SPEED / TTC           |
 | 142px   Small Cactus  | 13.0 spd / 10.9       |
@@ -193,7 +205,7 @@ The bridge injects a HUD on the top-right corner of the Chrome window:
 +-----------------------------------------------+
 ```
 
-* **Positioned Safely**: Mounted at `top: 75px` so Chrome Dino's native high score counter (`HI 00000`) remains visible.
+* **Positioned Safely**: Mounted at `top: 75px` so Chrome Dino's native in-game counter (`HI 00000`) remains visible.
 * **Draggable**: Click and drag the header bar to move the card anywhere on screen.
 * **Action Status Indicators**:
   * `RUNNING` - Emerald
@@ -311,8 +323,8 @@ dino-ai-nodemcu/
   1. Ensure your Micro-USB cable is a **data cable** (some cables are power-only).
   2. Install the **CP2102** or **CH340** driver mentioned in Step 1.
 
-#### Q: Why did the Dino crash at score 4567?
-* **Explanation**: At score 4000+, the game runs at maximum velocity (`speed = 13.0`). If two obstacles spawn in close cluster sequence (~50px apart), the dinosaur is still in the air descending from jump 1 when obstacle 2 arrives, leaving insufficient ground runway for takeoff.
+#### Q: Why does the Dino eventually crash at high speeds?
+* **Explanation**: At maximum velocity (`speed = 13.0`), if two obstacles spawn in close cluster sequence (~50px apart), the dinosaur is still in the air descending from jump 1 when obstacle 2 arrives, leaving insufficient ground runway for takeoff.
 
 #### Q: Why does the Dino crash immediately when I switch applications or minimize Chrome?
 * **Explanation**: 
