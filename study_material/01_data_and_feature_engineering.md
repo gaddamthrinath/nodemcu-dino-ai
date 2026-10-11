@@ -20,8 +20,6 @@ If you take a tiny grayscale screenshot of $100 \times 100$ pixels:
 Instead of passing millions of blank white background pixels, we extract the **exact mathematical state** the dinosaur needs to make a decision:
 * **Input size:** Just **10 numbers** per frame.
 * **Model size:** **499 parameters** (~1.9 KB of Flash memory).
-* **Processing time:** **< 0.1 ms** (10,000+ predictions per second on an ESP8266!).
-
 ```
 [Raw Pixel Approach - Heavy & Slow]
 Canvas (10,000 Pixels) ──> Heavy CNN (20 MB) ──> Takes 500 ms ──> CRASH!
