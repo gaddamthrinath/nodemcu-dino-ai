@@ -24,7 +24,7 @@ Instead of dumping the entire heavy book onto the tiny desk, the microcontroller
 4. **Immediately forgets the weight** and moves its finger to the next one!
 5. Only the final answers for each layer (16 numbers for Layer 1, 16 numbers for Layer 2) are written down on the scratchpad (RAM).
 
-**The result:** The model's ~500 weights consume **0 bytes of RAM**, and the entire decision is computed in **less than 0.08 milliseconds**!
+**The result:** The model's ~500 weights consume **0 bytes of RAM**, and the decision is computed virtually instantaneously in bare-metal C without runtime overhead!
 
 ---
 
@@ -112,7 +112,7 @@ A key embedded systems architectural question is:
 * **No RAM is wasted on weights:** All 500 weights live permanently on the Flash "bookshelf". They consume **0 bytes of RAM**.
 * **Stream, compute, and forget:** The CPU looks at one weight at a time, multiplies it with an input, adds it to the running sum, and immediately forgets it before reading the next one.
 * **Only layer outputs touch RAM:** The only numbers written down in RAM are the small layer outputs (16 numbers for Layer 1, 16 numbers for Layer 2).
-* **Blazing fast:** Because the chip does this in pure C without any heavy background software, it makes the decision in **0.08 milliseconds** (less than 1% of a single game frame).
+* **Blazing fast:** Because the chip does this in pure C without any heavy background software, it computes the decision at bare-metal speed with virtually zero overhead.
 
 ---
 
@@ -123,11 +123,11 @@ Many developers reflexively reach for **TensorFlow Lite Micro (TFLM)** or **micr
 ```
 [TensorFlow Lite Micro / Runtime Approach]
 Flatbuffer Parser ──> Dynamic Tensor Arena (malloc) ──> Graph Interpreter ──> Op Kernels
-Overhead: ~40 KB Flash + 15 KB SRAM + 2.0 to 5.0 ms latency
+Overhead: ~40 KB Flash + 15 KB SRAM + Heavy interpreter overhead
 
 [Direct C Header Approach (Our Project)]
 Raw Matrix Multiplications in Compiled C Code (PROGMEM)
-Overhead: ~2 KB Flash + 0 KB SRAM + 0.08 ms latency (25x faster!)
+Overhead: ~2 KB Flash + 0 KB SRAM + Direct compiled C execution (much faster!)
 ```
 
 ### Comparison Matrix
@@ -137,8 +137,8 @@ Overhead: ~2 KB Flash + 0 KB SRAM + 0.08 ms latency (25x faster!)
 | **Flash Binary Footprint** | 30 KB – 80 KB interpreter engine | **~1.9 KB total** (weights + code) |
 | **Dynamic SRAM Usage** | 10 KB – 30 KB "Tensor Arena" | **0 bytes** (weights stay in Flash) |
 | **Dynamic Allocation (`malloc`)** | Often required for tensor buffers | **Zero** (100% deterministic stack) |
-| **Inference Latency** | 2.0 ms to 5.0 ms per prediction | **< 0.08 ms** (80 microseconds!) |
-| **Throughput** | 200 – 500 inferences / sec | **12,500+ inferences / sec** |
+| **Inference Overhead** | Heavy interpreter graph traversal | **Direct compiled C arithmetic** |
+| **Execution Efficiency** | Complex multi-layer runtime | **Zero interpreter layers** |
 | **External Dependencies** | Heavy C++ libraries & toolchains | **Standard C / Arduino core only** |
 
 ### The Arduino Macro Gotcha: `BIAS1` vs `B1`
@@ -313,7 +313,7 @@ void process_command(char* line) {
         unsigned long t_start = micros();
         float confidence = 0.0f;
 
-        // Run inference (<0.08 ms)
+        // Run inference on bare metal
         int action = dino_predict(inputs, &confidence);
         unsigned long elapsed_us = micros() - t_start;
 
@@ -340,7 +340,7 @@ The techniques demonstrated here—`PROGMEM` static arrays, pure C forward pass,
 
 ### 2. High-Speed Industrial Sorting Flaps
 * **Requirement:** Optical sensors track pills or nuts moving at 5 meters/sec down a chute.
-* **Architecture:** An 80 MHz microcontroller parses optical sensor values, predicts defective items in 80 microseconds, and fires a pneumatic solenoid air jet to blow the defective pill into a reject bin.
+* **Architecture:** An 80 MHz microcontroller parses optical sensor values, predicts defective items in real time, and fires a pneumatic solenoid air jet to blow the defective pill into a reject bin.
 
 ### 3. Drone Flight Stabilization (Neuro-PID)
 * **Requirement:** 1,000 Hz attitude update rate (1.0 ms budget).
@@ -350,8 +350,8 @@ The techniques demonstrated here—`PROGMEM` static arrays, pure C forward pass,
 
 ### Summary of Module 3
 * `PROGMEM` stores neural network weights in **Flash ROM**, keeping dynamic **SRAM free**.
-* Pure C inference takes **< 0.08 ms** (80 microseconds), leaving runtime interpreters far behind.
+* Pure C inference executes directly on bare metal, eliminating runtime interpreter overhead.
 * Skipping Softmax during inference and using direct **Argmax on logits** saves CPU clock cycles.
-* **Non-blocking UART buffers + `strtok()`** ensure ultra-low communication latency at high frame rates.
+* **Non-blocking UART buffers + `strtok()`** ensure fast, non-blocking serial communication at high frame rates.
 
 ➡️ **Next Module:** `04_realtime_bridge_and_realworld_applications.md` (Connecting Python Selenium, Serial communication, and translating this to industry projects).

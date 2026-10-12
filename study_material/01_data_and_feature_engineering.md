@@ -25,7 +25,7 @@ Instead of passing millions of blank white background pixels, we extract the **e
 Canvas (10,000 Pixels) ──> Heavy CNN (20 MB) ──> Takes 500 ms ──> CRASH!
 
 [Edge AI Feature Approach - Ultra-Fast]
-Game State ──> 10 Float Numbers ──> Tiny MLP (1.9 KB) ──> Takes 0.08 ms ──> SUCCESS!
+Game State ──> 10 Float Numbers ──> Tiny MLP (1.9 KB) ──> Bare-Metal C Speed ──> SUCCESS!
 ```
 
 ---

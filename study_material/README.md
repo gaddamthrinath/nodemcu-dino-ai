@@ -31,14 +31,14 @@ The course is divided into 4 modular, self-contained study guides:
 * Microcontroller hardware architecture: Xtensa LX106 32-bit core, SRAM vs Flash ROM.
 * Why raw weights in C `PROGMEM` outperform runtime interpreters (TensorFlow Lite Micro / ONNX).
 * Memory layout: Zero dynamic heap allocation (`malloc`), zero RAM footprint for weights.
-* Pure C forward pass walkthrough (`dino_predict`) taking $< 0.08\text{ ms}$ ($80\text{ µs}$).
+* Pure C forward pass walkthrough (`dino_predict`) with zero runtime interpreter overhead.
 * Zero-cost Argmax selection on raw logits without computing Softmax.
 * Non-blocking high-speed serial packet accumulation and tokenization (`strtok`).
 * **Real-World Parallels:** Hard real-time control (airbags, active suspension, industrial pneumatic sorting).
 
 ### [Module 04: Real-Time Bridge & Real-World Edge AI Applications](04_realtime_bridge_and_realworld_applications.md)
 * Full-duplex system architecture: Chrome JS $\leftrightarrow$ Python Bridge $\leftrightarrow$ NodeMCU C.
-* Latency budgeting: Tracing a frame through the $< 1.88\text{ ms}$ roundtrip loop.
+* Real-time communication pipeline designed to communicate fast enough for responsive game control.
 * Python Selenium automation and stateful keypress controller (duck hold vs jump tap).
 * In-browser draggable glassmorphic HUD telemetry injection.
 * Client-side JavaScript neural network runner (`browser_ai.js`).

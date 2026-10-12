@@ -1,6 +1,6 @@
 # Module 04: Real-Time Bridge & Real-World Edge AI Applications
 
-> **Goal:** Understand the complete full-duplex communication loop between Chrome, Python, and NodeMCU, analyze the sub-2 millisecond latency budget, master stateful keypress injection and HUD telemetry, and learn how to adapt this entire pipeline to real-world industrial IoT and robotics products.
+> **Goal:** Understand the complete full-duplex communication loop between Chrome, Python, and NodeMCU, understand how the communication pipeline stays fast enough for real-time responsiveness, master stateful keypress injection and HUD telemetry, and learn how to adapt this entire pipeline to real-world industrial IoT and robotics products.
 
 ---
 
@@ -14,22 +14,22 @@ The following diagram illustrates the complete data lifecycle of every single ga
 │    Runs Chrome Dino @ 60-80 FPS                                        │
 │    JS snippet extracts: [dist, speed, type, y, h, w, ducking, ttc]     │
 └───────────────────────────────────┬────────────────────────────────────┘
-                                    │ Python Selenium Driver (~0.8 ms)
+                                    │ Fast IPC via Selenium execute_script
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │ 2. PYTHON SERIAL BRIDGE (play_nodemcu.py)                              │
 │    Formats 10-float CSV string: "120.5,9.2,1,0,0,100,35,20,0,13.1\n"   │
 └───────────────────────────────────┬────────────────────────────────────┘
-                                    │ USB UART @ 115200 Baud (~0.35 ms)
+                                    │ High-speed USB UART @ 115200 Baud
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │ 3. NODEMCU ESP8266 (dino_nodemcu.ino)                                  │
 │    • Non-blocking ring buffer accumulates packet                       │
-│    • C matrix multiplication runs in Flash ROM: dino_predict()         │
-│    • Execution time: 0.08 ms (80 microseconds!)                        │
+│    • Bare-metal C matrix multiplication in Flash ROM: dino_predict()   │
+│    • Fast on-chip decision                                             │
 │    • Transmits reply: "PRED:1,4.82,82\n" (Action: JUMP)                │
 └───────────────────────────────────┬────────────────────────────────────┘
-                                    │ USB UART @ 115200 Baud (~0.15 ms)
+                                    │ High-speed USB UART @ 115200 Baud
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │ 4. PYTHON ACTION DISPATCHER                                            │
@@ -41,24 +41,31 @@ The following diagram illustrates the complete data lifecycle of every single ga
 
 ---
 
-## 2. Latency Budgeting: Why Sub-2ms Latency Matters
+## 2. Real-Time Communication & Responsiveness: Fast Enough for Edge Control
 
-In real-time control (whether jumping over a cactus at speed 13.0 or emergency braking a car at 100 km/h), **latency is life or death**.
+In real-time systems (whether jumping over a cactus at maximum game speed or triggering emergency braking in an autonomous vehicle), **responsiveness and communication speed are critical**.
 
-At maximum speed ($13.0\text{ px/frame}$), an obstacle moves across the screen in just a few hundred milliseconds. If your AI decision takes 50 ms, the dinosaur crashes before the jump key is even pressed!
+At higher game speeds, obstacles approach rapidly. If communication between the browser, Python bridge, and microcontroller is slow or blocking, the dinosaur crashes before the jump key is ever registered. The entire architecture is designed so data flows **fast enough to keep pace with the game loop in real time**.
 
-### Latency Breakdown per Frame
+### What Makes the Communication Fast Enough?
 
-| Step | Operation | Duration | Percentage of Frame |
-| :--- | :--- | :--- | :--- |
-| **1** | JavaScript game state read via Selenium | $\sim 0.80\text{ ms}$ | 42.5% |
-| **2** | PySerial UART transmission (PC $\to$ NodeMCU) | $\sim 0.35\text{ ms}$ | 18.6% |
-| **3** | **NodeMCU C Neural Network Inference** | **$0.08\text{ ms}$** | **4.3%** |
-| **4** | PySerial UART transmission (NodeMCU $\to$ PC) | $\sim 0.15\text{ ms}$ | 8.0% |
-| **5** | Python stateful keypress dispatch & HUD update | $\sim 0.50\text{ ms}$ | 26.6% |
-| **Total** | **Full End-to-End Decision Loop** | **$\sim 1.88\text{ ms}$** | **100%** |
+Instead of relying on heavy network stacks or slow polling, every step of the pipeline is stripped down to maximize throughput and maintain high responsiveness:
 
-Since a 60 FPS frame allows **16.66 ms** of time, our $1.88\text{ ms}$ loop uses **only 11% of the available frame budget**, guaranteeing buttery-smooth 60–80 FPS execution without missing a single frame!
+| Pipeline Stage | Implementation | Why It Communicates Fast Enough |
+| :--- | :--- | :--- |
+| **1. Browser State Read** | Selenium `execute_script()` reading `window.dinoState()` | Accesses internal game variables directly from memory without the overhead of screen scraping or visual OCR. |
+| **2. PC $\to$ NodeMCU Stream** | PySerial UART @ 115200 Baud with small buffer flush | Sends a compact ASCII CSV string containing only the essential numeric features. |
+| **3. Hardware Inference** | Bare-metal C MLP compiled into ESP8266 Flash ROM | Pure arithmetic matrix math executed directly on the CPU with zero runtime interpreter or OS overhead. |
+| **4. NodeMCU $\to$ PC Reply** | Non-blocking serial reply (`Serial.println(action)`) | Minimal single-token action payload returned immediately upon calculation. |
+| **5. Action Dispatch** | Native browser event dispatch + DOM HUD update | Instant dispatch directly targeting the active browser window. |
+
+### Practical Timing & Responsiveness Considerations
+
+In real-world setups across various USB-to-UART bridge chips (CH340, CP2102), operating system schedulers, and driver buffers:
+
+* **The Core Goal:** The objective is not chasing theoretical or unrealistic latency figures, but ensuring the complete roundtrip communicates **fast enough** to easily stay ahead of the game's reaction window.
+* **Keeping Pace with 60 FPS:** The Chrome Dino game updates at approximately 60 frames per second. As long as state extraction, serial transmission, and action execution finish comfortably within each frame cycle, gameplay remains responsive with zero noticeable control lag.
+* **Zero Queue Accumulation:** Non-blocking serial buffers and quick packet handling prevent stale backlogs, ensuring the AI is always reacting to the freshest game state.
 
 ---
 
@@ -140,7 +147,7 @@ hud.innerHTML = `
     <div style="font-weight: bold; color: #38bdf8;">NodeMCU Edge AI Telemetry</div>
     <div>FPS: <span id="hud-fps" style="color: #4ade80;">--</span></div>
     <div>Action: <span id="hud-action" style="color: #facc15;">RUN</span></div>
-    <div>Latency: <span id="hud-lat" style="color: #cbd5e1;">-- µs</span></div>
+    <div>Response: <span id="hud-resp" style="color: #cbd5e1;">Fast / Live</span></div>
 `;
 document.body.appendChild(hud);
 ```
@@ -257,7 +264,7 @@ Here are 4 industry blueprints you can build today using this exact blueprint:
   2. `gyro_magnitude = sqrt(gx^2 + gy^2 + gz^2)`
   3. `jerk_metric = d(accel)/dt`
   4. `vertical_orientation_angle`
-  5. `freefall_duration_ms`
+  5. `freefall_duration`
   6. `post_impact_immobility_seconds`
   7. `heart_rate_bpm`
 * **Microcontroller Actions:**
@@ -297,8 +304,8 @@ When you are ready to expand your embedded AI skills beyond this project:
 ---
 
 ### Summary of Module 4
-* The complete system operates in **$\sim 1.88\text{ ms}$**, using only **11%** of a 60 FPS frame window.
+* The full-duplex loop communicates **fast enough** to process states and trigger key actions in real time without falling behind the game pace.
 * **Stateful key controls** prevent jerky transitions and allow holding the duck key through long obstacles.
-* The exact same feature engineering, C code generation, and low-latency inference patterns power **real-world robotics, predictive maintenance, and medical devices**.
+* The exact same feature engineering, C code generation, and responsive communication patterns power **real-world robotics, predictive maintenance, and medical devices**.
 
 🎉 **Congratulations! You have completed the full NodeMCU Dino Edge AI Study Course.**
